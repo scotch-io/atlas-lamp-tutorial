@@ -1,0 +1,55 @@
+{
+    "variables": {
+        "aws_access_key": "YOUR_ACCESS_KEY",
+        "aws_secret_key": "YOUR_SECRET_KEY"
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-east-1",
+        "source_ami": "ami-9a562df2",
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu",
+        "ami_name": "mysql {{timestamp}}"
+    }],
+    "push": {
+      "name": "<username>/mysql"
+    },
+    "provisioners": [
+    {   
+        "type": "shell",
+        "inline": [
+            "sudo mkdir /ops",
+            "sudo chmod a+w /ops"
+        ]
+    },
+    {   
+        "type": "file",
+        "source": ".",
+        "destination": "/ops"
+    },
+    {
+        "type": "shell",
+        "script": "scripts/base.sh"
+    },
+    {
+        "type": "shell",
+        "script": "scripts/debug.sh"
+    },
+    {
+        "type": "shell",
+        "script": "scripts/mysql.sh"
+    }
+    ],
+    "post-processors": [
+      {
+        "type": "atlas",
+        "artifact": "<username>/mysql",
+        "artifact_type": "aws.ami",
+        "metadata": {
+          "created_at": "{{timestamp}}"
+        }
+      }
+    ]
+}

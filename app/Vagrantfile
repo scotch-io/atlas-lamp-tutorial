@@ -1,0 +1,14 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Learn more about Scotch Box here: https://box.scotch.io/
+  config.vm.box = "scotch/box"
+  config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.hostname = "scotchbox"
+  config.vm.synced_folder ".", "/var/www/public", :mount_options => ["dmode=777", "fmode=666"]
+
+  config.push.define "atlas" do |push|
+    push.app = "<username>/php"
+  end
+end

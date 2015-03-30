@@ -1,0 +1,52 @@
+{
+    "variables": {
+        "aws_access_key": "YOUR_ACCESS_KEY_HERE",
+        "aws_secret_key": "YOUR_SECRET_KEY_HERE"
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-east-1",
+        "source_ami": "ami-9a562df2",
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu",
+        "ami_name": "consul {{timestamp}}"
+    }],
+    "push": {
+      "name": "<username>/consul",
+      "vcs": false
+    },
+    "provisioners": [
+    {   
+        "type": "shell",
+        "inline": [
+            "sudo mkdir /ops",
+            "sudo chmod a+w /ops"
+        ]
+    },
+    {   
+        "type": "file",
+        "source": ".",
+        "destination": "/ops"
+    },
+    {
+        "type": "shell",
+        "script": "scripts/base.sh"
+    },
+    {
+        "type": "shell",
+        "script": "scripts/consul.sh"
+    }
+    ],
+    "post-processors": [
+      {
+        "type": "atlas",
+        "artifact": "<username>/consul",
+        "artifact_type": "aws.ami",
+        "metadata": {
+          "created_at": "{{timestamp}}"
+        }
+      }
+    ]
+}

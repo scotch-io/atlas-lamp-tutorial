@@ -1,0 +1,10 @@
+<?php
+$username = "apache";
+$password = "password";{{range service "mysql.database"}}
+$hostname = "{{.Address}}"{{end}};
+
+//connection to the database
+$dbhandle = mysql_connect($hostname, $username, $password)
+  or die("Unable to connect to MySQL");
+echo "Connected to MySQL<br>";
+?>
